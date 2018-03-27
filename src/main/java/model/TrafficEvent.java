@@ -120,6 +120,7 @@ public class TrafficEvent {
         String result = "";
         result += "TimeStamp: " + timeStamp;
         result += "\nSpeed: " + speed;
+        result += "\nTravel Time: " + travelTime;
         result += "\nFree Flow Speed: " + freeFlowSpeed;
         result += "\nConfidence: " + confidence;
         result += "\nRoute: " + route;

@@ -109,7 +109,7 @@ public class InrixProcessor extends AbstractProcessor {
     public static void insertProviders(){
         ProviderDriver pDriver = new ProviderDriver("127.0.0.1", 27017);
         pDriver.connectToDatabase();
-        String [] providers = {"HERE", "INRIX", "TomTom"};
+        String [] providers = {"HERE", "INRIX", "TomTom", "ANPR", "GPS"};
         for(String provider : providers)
             pDriver.insert(new Provider(provider));
         pDriver.disconnect();
@@ -117,7 +117,7 @@ public class InrixProcessor extends AbstractProcessor {
 
     public static void main (String [] args){
         insertProviders();
-        InrixProcessor processor = new InrixProcessor("C:\\Users\\flori\\Documents\\Traffic\\Dachauer\\Traffic", "127.0.0.1", 27017);
+        InrixProcessor processor = new InrixProcessor("C:\\Users\\flori\\Documents\\MA_Messung_3\\Traffic", "127.0.0.1", 27017);
         processor.setReferenceSchemaPath("C:\\Users\\flori\\Documents\\Traffic\\Traffic\\2017_11_24_00_35_38_INRIX_XD_INFO.xml");
         processor.getReferenceSchema();
         processor.process();

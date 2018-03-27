@@ -50,9 +50,8 @@ public class HereProcessor extends AbstractProcessor{
     }
 
     public static void main (String [] args){
-        HereProcessor processor = new HereProcessor("C:\\Users\\flori\\Documents\\Traffic\\Dachauer\\Traffic", "127.0.0.1", 27017);
+        HereProcessor processor = new HereProcessor("C:\\Users\\flori\\Documents\\MA_Messung_1\\Traffic", "127.0.0.1", 27017);
         processor.process();
     }
-
 
 }
