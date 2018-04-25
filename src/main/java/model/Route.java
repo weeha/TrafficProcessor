@@ -69,6 +69,14 @@ public class Route {
         return location;
     }
 
+    public boolean equals(Object o){
+        if(o instanceof Route){
+            Route r = (Route) o;
+            return this.getLocation().equals(r.getLocation());
+        }
+        return false;
+    }
+
     public void setLength(double length) {
         this.length = length;
     }

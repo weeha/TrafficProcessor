@@ -10,7 +10,7 @@ public class ANPRHandler {
 
     private List<MeasurementResult> measurements;
     private List<TrafficEvent> events;
-    private int timeInterval = 2;
+    private int timeInterval = 1;
     private int startSeconds = 0;
     private Integer maxTimeIncluded = null;
 
@@ -39,13 +39,14 @@ public class ANPRHandler {
         sortList();
         if(measurements.size() < 1)
             return;
-        int runner = 1;
+        int runner = 0;
         int intervalRunner = 0;
         int minuteRunner = measurements.get(0).getDate().getMinutes();
         double speedCounter = 0;
         int travelTimeCounter = 0;
         Date lastTimeStamp = measurements.get(0).getDate();
         Date intervalDate = measurements.get(0).getDate();
+        double smoothedSpeed = smoothedSpeed(0.0, 0.0 , 0.3);
         for(MeasurementResult m : measurements){
 
             intervalRunner++;
@@ -56,6 +57,7 @@ public class ANPRHandler {
                 TrafficEvent e = new TrafficEvent();
                 e.setTravelTime(travelTimeCounter/runner);
                 e.setSpeed(Math.round((speedCounter/runner)*100.0)/100.0);
+                //e.setSpeed(Math.round((smoothedSpeed)*100.0)/100.0);
                 e.setTimeStamp(lastTimeStamp);
                 events.add(e);
 
@@ -63,14 +65,21 @@ public class ANPRHandler {
                 intervalDate = m.getDate();
                 speedCounter = 0;
                 travelTimeCounter = 0;
-                runner = 1;
+                runner = 0;
+                smoothedSpeed = 0.0;
             }
             lastTimeStamp = m.getDate();
             speedCounter += m.getSpeedInKmH();
+            smoothedSpeed = smoothedSpeed(m.getSpeedInKmH(), smoothedSpeed, 0.3);
             travelTimeCounter += m.getTravelTime();
             runner++;
+            intervalRunner++;
         }
         System.out.println(measurements.size());
+    }
+
+    private double smoothedSpeed(double v_i, double v_g_i, double alpha){
+        return v_i*alpha + v_g_i*(1-alpha);
     }
 
     private int getIntervalRunner(Date d){

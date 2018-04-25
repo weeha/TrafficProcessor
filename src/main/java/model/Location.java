@@ -48,6 +48,23 @@ public class Location extends BasicDBObject{
         put("coordinates", coordinates);
     }
 
+    public boolean equals(Object o){
+        if(o instanceof Location){
+            Location loc = (Location) o;
+            if(loc.coordinates.size() != this.coordinates.size())
+                return false;
+            for(int i = 0; i < loc.coordinates.size(); i++){
+                List<Double> coord1 = loc.coordinates.get(i);
+                List<Double> coord2 = this.coordinates.get(i);
+                if(!coord1.get(0).equals(coord2.get(0)))
+                    if(!coord1.get(1).equals(coord2.get(1)))
+                        return false;
+            }
+            return true;
+        }
+        return false;
+    }
+
     public void setFunctionalClass(int functionalClass) {
         this.functionalClass = functionalClass;
     }

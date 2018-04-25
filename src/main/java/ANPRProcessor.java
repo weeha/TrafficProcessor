@@ -17,7 +17,7 @@ public class ANPRProcessor extends AbstractProcessor{
     private final String startFile;
     private final String endFile;
     private Integer length = null;
-    public static int TIME_INTERVALL = 2;
+    public static int TIME_INTERVALL = 5;
     private Integer maxTime = null;
     private Location loc;
     private TrafficRoute tRoute;
@@ -70,9 +70,11 @@ public class ANPRProcessor extends AbstractProcessor{
         // insert into db
         ANPRHandler handler = new ANPRHandler(mResults, this.TIME_INTERVALL);
         handler.setMaxTimeIncluded(maxTime);
+        /*
         handler.generateEventList();
         System.out.println(handler.getEvents().size());
-
+        //handler.printEventsAsCSV();
+        handler.generateEventList();
         EventDriver driver = new EventDriver(address, port);
         driver.connectToDatabase();
         for(TrafficEvent e : handler.getEvents()){
@@ -81,6 +83,8 @@ public class ANPRProcessor extends AbstractProcessor{
             driver.insert(e);
         }
         driver.disconnect();
+        */
+        handler.printCSV();
     }
 
 
@@ -111,7 +115,7 @@ public class ANPRProcessor extends AbstractProcessor{
 
     public static void main(String [] args){
 
-        InrixProcessor.insertProviders();
+        //InrixProcessor.insertProviders();
 
         String  endFile = "C:\\Users\\flori\\Dropbox\\Uni\\Master\\Masterarbeit\\02_Dokumente\\Messungsdaten\\Messung_3_Ende.csv";
         String startFile = "C:\\Users\\flori\\Dropbox\\Uni\\Master\\Masterarbeit\\02_Dokumente\\Messungsdaten\\Messung_3_Start.csv";
@@ -124,8 +128,8 @@ public class ANPRProcessor extends AbstractProcessor{
         location.addCoordinates(start);
         location.addCoordinates(end);
 
-        processor.setMetaInformation(300, location);
-        System.out.println(location);
+        processor.setMetaInformation(290, location);
+        //System.out.println(location);
         processor.process();
 
     }

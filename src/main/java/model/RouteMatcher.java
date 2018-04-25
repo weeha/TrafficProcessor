@@ -1,5 +1,6 @@
 package model;
 
+import model.location.TracePoint;
 import org.apache.http.*;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.HttpPost;
@@ -24,6 +25,7 @@ public class RouteMatcher {
     private org.apache.http.client.HttpClient client;
     protected RequestConfig config = null;
     private TrafficRoute tRoute;
+    private List<TracePoint> points = new ArrayList<TracePoint>();
     private Pattern coordinatePattern = Pattern.compile("([0-9]+.[0-9]+) ([0-9]+.[0-9]+)");
 
     public RouteMatcher(TrafficRoute route){
@@ -43,7 +45,7 @@ public class RouteMatcher {
     private String generateGPXString(){
         String gpx =
                 "<?xml version=\"1.0\"?>" +
-                "<gpx version=\"1.0\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns=\"http://www.topografix.com/GPX/1/0\" xsi:schemaLocation=\"http://www.topografix.com/GPX/1/0 http://www.topografix.com/GPX/1/0/gpx.xsd\">" +
+                "<gpx version=\"1.0\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns=\"http://www.topografix.com/GPX/1/0\" xsi:schemaLocation=\"http://www.topografix.com/GPX/1/0 http://www.topografix.com/GPX/1/0/GPX.xsd\">" +
                 "<trk>" +
                 "<trkseg>";
                 //"<trkpt "
@@ -61,7 +63,7 @@ public class RouteMatcher {
     }
 
     private String getApiLink(){
-        String link = "http://rme.cit.api.here.com/2/matchroute.json?routemode=car&app_id=rgV0rSjDDzgFVlLwBIp3&app_code=yf0KRNYZip_Ys8LY6YiSsw";
+        String link = "http://rme.cit.api.here.com/2/matchroute.json?routemode=car&app_id=UarjvWLh0j2kKcfM2DY9&app_code=ZqdFtOoZjmRArOLVSoTCNg";
         return link;
     }
 
@@ -77,10 +79,14 @@ public class RouteMatcher {
     }
 
     public List<Route> match(String resultString){
-        System.out.println(resultString);
         List<Route> matchedRoutes = new ArrayList<Route>();
         JSONObject obj = new JSONObject(resultString);
-        JSONArray routeLinks = obj.getJSONArray("RouteLinks");
+        JSONArray routeLinks;
+        try {
+            routeLinks = obj.getJSONArray("RouteLinks");
+        }catch (Exception e){
+            return new ArrayList<Route>();
+        }
         Route route = null;
         for(Object routeLink : routeLinks){
             if(routeLink instanceof JSONObject){
@@ -109,8 +115,64 @@ public class RouteMatcher {
         }
         System.out.println("####################################");
         System.out.println("ORIGINAL ROUTE");
-        System.out.println(this.tRoute.getLocation());
+        if(this.tRoute != null)
+            System.out.println(this.tRoute.getLocation());
         System.out.println("MATCHED ROUTE");
+        for(Route r : matchedRoutes)
+            System.out.println(r.getLocation());
+        System.out.println("####################################");
+        return matchedRoutes;
+    }
+
+    public List<TracePoint> getPoints() {
+        return points;
+    }
+
+    public List<Route> matchGpx(String resultString){
+        List<Route> matchedRoutes = new ArrayList<Route>();
+        JSONObject obj = new JSONObject(resultString);
+        JSONArray routeLinks;
+        try {
+            routeLinks = obj.getJSONArray("RouteLinks");
+        }catch (Exception e){
+            return new ArrayList<Route>();
+        }
+        Route route = null;
+        for(Object routeLink : routeLinks){
+            if(routeLink instanceof JSONObject){
+                route = new Route();
+
+                route.setId(((JSONObject)routeLink).getInt("linkId"));
+                route.setLength(((JSONObject) routeLink).getDouble("linkLength"));
+                Matcher m = coordinatePattern.matcher(((JSONObject) routeLink).getString("shape"));
+                Location location = new Location();
+                if(false){
+                    while(m.find()){
+                        Coordinate c = new Coordinate(Double.parseDouble(m.group(2)), Double.parseDouble(m.group(1)));
+                        location.addReverseCoordinates(c);
+                    }
+                }else {
+                    while (m.find()) {
+                        Coordinate c = new Coordinate(Double.parseDouble(m.group(2)), Double.parseDouble(m.group(1)));
+                        location.addCoordinates(c);
+                    }
+                }
+                route.setLocation(location);
+                matchedRoutes.add(route);
+            }
+        }
+
+        JSONArray tracePoints = obj.getJSONArray("TracePoints");
+        for(Object tracePoint : tracePoints){
+            int id = ((JSONObject)tracePoint).getInt("linkIdMatched");
+            double lat = ((JSONObject)tracePoint).getDouble("lat");
+            double lon = ((JSONObject)tracePoint).getDouble("lon");
+            TracePoint point = new TracePoint(id, lat, lon);
+            points.add(point);
+        }
+
+        if(this.tRoute != null)
+            System.out.println(this.tRoute.getLocation());
         for(Route r : matchedRoutes)
             System.out.println(r.getLocation());
         System.out.println("####################################");
@@ -129,6 +191,33 @@ public class RouteMatcher {
             headers[1] = acceptHeader ;
             post.setHeaders(headers);
             post.setEntity(new StringEntity(generateGPXString()));
+            HttpResponse response = client.execute(post);
+            System.out.println("\nSending 'POST' request to URL : " + getApiLink());
+            System.out.println("Post parameters : " + post.getEntity());
+            System.out.println("Response Code : " +
+                    response.getStatusLine().getStatusCode());
+
+            String responseString = EntityUtils.toString(response.getEntity(), "ISO-8859-1");
+
+            return responseString;
+        }catch(IOException ie){
+            ie.printStackTrace();
+        }
+        return "";
+    }
+
+    public String callRouteMatchFromString(String gpx){
+        try {
+            //generateRequest();
+            Header [] headers = new Header[2];
+            HttpPost post = new HttpPost(getApiLink());
+
+            BasicHeader contentTypeHeader = new BasicHeader(CONTENT_TYPE, "*");
+            BasicHeader acceptHeader = new BasicHeader(ACCEPT, "*");
+            headers[0] = contentTypeHeader;
+            headers[1] = acceptHeader ;
+            post.setHeaders(headers);
+            post.setEntity(new StringEntity(gpx));
             HttpResponse response = client.execute(post);
             System.out.println("\nSending 'POST' request to URL : " + getApiLink());
             System.out.println("Post parameters : " + post.getEntity());
