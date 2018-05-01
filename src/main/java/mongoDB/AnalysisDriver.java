@@ -12,7 +12,7 @@ public abstract class AnalysisDriver {
     private MongoClient mongo = null;
     protected MongoDatabase database = null;
     protected MongoCollection<Document> collection = null;
-    public static final String DB_NAME = "Interval3";
+    public static final String DB_NAME = "TrafficData";
 
     public AnalysisDriver(String address, int port){
 

@@ -15,6 +15,7 @@ public abstract class AbstractProcessor {
     EventDriver eventDriver = null;
     public static final String HERE = "HERE";
     public static final String INRIX = "INRIX";
+    public static final String TomTom = "TomTom";
     ObjectId providerId;
 
     public AbstractProcessor(String path, String address, int port){
