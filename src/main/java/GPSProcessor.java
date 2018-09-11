@@ -1,4 +1,3 @@
-import com.sun.deploy.trace.Trace;
 import handlers.GPXHandler;
 import model.*;
 import model.location.TracePoint;
@@ -260,7 +259,6 @@ public class GPSProcessor extends AbstractProcessor{
 
     public static void main(String[]args){
         String path = "C:\\Users\\flori\\Documents\\Traffic\\files\\gpx";
-        InrixProcessor.insertProviders();
         GPSProcessor processor = new GPSProcessor(path, "127.0.0.1", 27017);
         processor.process();
     }

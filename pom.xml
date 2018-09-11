@@ -7,7 +7,12 @@
     <groupId>com.tum.fn</groupId>
     <artifactId>TrafficProcessor</artifactId>
     <version>1.0-SNAPSHOT</version>
-
+    <repositories>
+        <repository>
+            <id>openlr</id>
+            <url>http://www.openlr.org/nexus/content/repositories/releases</url>
+        </repository>
+    </repositories>
     <dependencies>
         <dependency>
             <groupId>org.apache.poi</groupId>
@@ -53,6 +58,21 @@
             <groupId>com.google.protobuf</groupId>
             <artifactId>protobuf-java</artifactId>
             <version>3.3.0</version>
+        </dependency>
+        <dependency>
+            <groupId>openlr</groupId>
+            <artifactId>map</artifactId>
+            <version>LATEST</version>
+        </dependency>
+        <dependency>
+            <groupId>openlr</groupId>
+            <artifactId>binary</artifactId>
+            <version>LATEST</version>
+        </dependency>
+        <dependency>
+            <groupId>openlr</groupId>
+            <artifactId>decoder</artifactId>
+            <version>LATEST</version>
         </dependency>
     </dependencies>
 
